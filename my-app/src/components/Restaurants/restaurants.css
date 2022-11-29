@@ -1,4 +1,27 @@
-.restaurants-container {
+.restaurants-section {
   width: 30%;
   height: 100%;
 }
+
+.restaurants-container{
+  overflow-y: scroll;
+  max-height: 100vh;
+}
+
+.restaurant-container{
+  display: flex;
+  width: 90%;
+  margin: auto;
+  justify-content: space-between;
+  margin-top: 20px;
+  text-align: left;
+
+}
+
+.restaurant-container img{
+  width: 120px;
+  min-height: 80px;
+  max-height: 80px;
+  object-fit: cover
+}
+
