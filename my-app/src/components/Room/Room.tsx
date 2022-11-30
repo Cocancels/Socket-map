@@ -10,6 +10,10 @@ var socket = io("http://localhost:4001", {
 export interface User {
   id: number;
   name: string;
+  position: {
+    lat: number;
+    lng: number;
+  };
   socketId: number;
   restaurant: RestaurantKeys;
 }
@@ -17,10 +21,11 @@ export interface User {
 interface RoomProps {
   onUserChange: (user: User) => void;
   currentUser: User | null;
+  setNewUsers: (users: User[]) => void;
 }
 
 export const Room = (props: RoomProps) => {
-  const { onUserChange, currentUser } = props;
+  const { onUserChange, currentUser, setNewUsers } = props;
   const [users, setUsers] = useState<User[]>([]);
   const [username, setUsername] = useState("");
   const [isInRoom, setIsInRoom] = useState(false);
@@ -32,10 +37,12 @@ export const Room = (props: RoomProps) => {
   useEffect(() => {
     socket.on("getUsers", (users: User[]) => {
       setUsers(users);
+      setNewUsers(users);
     });
 
     socket.on("userJoined", (users: User[]) => {
       setUsers(users);
+      setNewUsers(users);
       setIsInRoom(true);
     });
 
@@ -43,10 +50,6 @@ export const Room = (props: RoomProps) => {
       onUserChange(user);
     });
   }, []);
-
-  useEffect(() => {
-    console.log("currentUser", currentUser);
-  }, [currentUser]);
 
   return (
     <div className="room-container">

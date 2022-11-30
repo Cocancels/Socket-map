@@ -1,9 +1,15 @@
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Polyline,
+  Popup,
+} from "react-leaflet";
 import "./map.css";
 import "leaflet/dist/leaflet.css";
 
 import L, { LatLngExpression } from "leaflet";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RestaurantKeys } from "../../interfaces/Restaurant";
 import { User } from "../Room/Room";
 
@@ -16,22 +22,21 @@ L.Icon.Default.mergeOptions({
 interface MapProps {
   selectedRestaurant: RestaurantKeys;
   currentUser: User | null;
+  users: User[];
 }
 
 export const Map = (props: MapProps) => {
-  const { selectedRestaurant, currentUser } = props;
+  const { selectedRestaurant, currentUser, users } = props;
 
   const [position, setPosition] = useState<LatLngExpression>({
     lat: 0,
     lng: 0,
   });
   const [map, setMap] = useState<any>();
-  const [finalPosition, setFinalPosition] = useState<LatLngExpression>({
+  const [finalPosition, setFinalPosition] = useState<any>({
     lat: 5,
     lng: 5,
   });
-  const [showFinalPosition, setShowFinalPosition] = useState(false);
-  const [markers, setMarkers] = useState<any>([]);
 
   const getLocation = () => {
     if (navigator.geolocation) {
@@ -44,115 +49,53 @@ export const Map = (props: MapProps) => {
         map.flyTo(actualPosition, 10, {
           duration: 2,
         });
-        addMarker(actualPosition);
       });
     } else {
       alert("Geolocation is not supported by this browser.");
     }
   };
 
-  const getTime = (speed: number, distance: number) => {
-    const time = distance / speed;
-    return time;
+  // function to get distance between two coordinates, in meters
+  const getDistance = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ) => {
+    const R = 6371e3; // metres
+    const φ1 = (lat1 * Math.PI) / 180; // φ, λ in radians
+    const φ2 = (lat2 * Math.PI) / 180;
+    const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+    const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+
+    const a =
+      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    const d = R * c; // in metres
+    return d;
   };
 
-  const getDistance = (pos1: LatLngExpression, pos2: LatLngExpression) => {
-    const distance = map.distance(pos1, pos2);
-    return distance / 1000;
-  };
-
-  const addRestaurantMarker = () => {
-    const newMarker: any = L.marker([
-      selectedRestaurant.position.lat,
-      selectedRestaurant.position.lng,
-    ])
-      .addTo(map)
-      .bindPopup(selectedRestaurant.name)
-      .openPopup();
-
-    newMarker.restaurantId = selectedRestaurant.id;
-    deleteRestaurantsMarkers();
-    setMarkers([...markers, newMarker]);
-  };
-
-  const deleteRestaurantsMarkers = () => {
-    markers.forEach((marker: any) => {
-      if (marker.restaurantId) {
-        map.removeLayer(marker);
-        markers.splice(markers.indexOf(marker), 1);
-      }
-    });
-    setMarkers(markers);
-  };
-
-  const addMarker = (pos: LatLngExpression) => {
-    const newMarker = L.marker(pos).addTo(map);
-    createVector(pos, finalPosition);
-    setShowFinalPosition(true);
-    setMarkers([...markers, newMarker]);
-  };
-
-  const createVector = (pos: any, finalPos: LatLngExpression) => {
-    L.polyline([pos, finalPos], {
-      color: "red",
-      weight: 3,
-      opacity: 0.5,
-      smoothFactor: 1,
-    }).addTo(map);
-  };
-
-  const deleteVector = () => {
-    map.eachLayer((layer: any) => {
-      if (layer instanceof L.Polyline) {
-        map.removeLayer(layer);
-      }
-    });
-  };
-
-  function DraggableMarker() {
-    const markerRef = useRef<any>(null);
-    const eventHandlers = useMemo(
-      () => ({
-        dragend() {
-          const marker = markerRef.current;
-          if (marker != null) {
-            deleteVector();
-            setFinalPosition(marker.getLatLng());
-            createVector(position, marker.getLatLng());
-          }
-        },
-      }),
-      []
-    );
-
-    return (
-      <Marker
-        draggable={true}
-        eventHandlers={eventHandlers}
-        position={finalPosition}
-        ref={markerRef}
-      ></Marker>
-    );
-  }
+  const eventHandlers = useMemo(
+    () => ({
+      dragend(e: any) {
+        const marker = e.target;
+        if (marker != null) {
+          setFinalPosition(marker.getLatLng());
+        }
+      },
+    }),
+    []
+  );
 
   useEffect(() => {
-    selectedRestaurant.id !== 0 && addRestaurantMarker();
-  }, [selectedRestaurant]);
-
-  useEffect(() => {
-    if (currentUser && selectedRestaurant.id !== 0) {
-      getLocation();
-      deleteVector();
-      createVector(position, selectedRestaurant.position);
-    }
+    getLocation();
   }, [currentUser]);
 
   return (
     <div className="map-container">
       <h1>Map</h1>
-      <button onClick={getLocation}>
-        <span>Get Location</span>
-      </button>
 
       <MapContainer
         center={position}
@@ -164,8 +107,73 @@ export const Map = (props: MapProps) => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {showFinalPosition && <DraggableMarker />}
+        {currentUser && (
+          <>
+            <Marker position={position}>
+              <Popup>You</Popup>
+            </Marker>
+
+            {selectedRestaurant.id !== 0 ? (
+              <>
+                <Marker position={selectedRestaurant.position}>
+                  <Popup>{selectedRestaurant.name}</Popup>
+                </Marker>
+
+                <Polyline
+                  pathOptions={{ color: "red" }}
+                  positions={[position, selectedRestaurant.position]}
+                />
+
+                <Polyline
+                  pathOptions={{ color: "red" }}
+                  positions={[selectedRestaurant.position, finalPosition]}
+                />
+              </>
+            ) : (
+              <Polyline
+                pathOptions={{ color: "red" }}
+                positions={[position, finalPosition]}
+              />
+            )}
+
+            {users.map((user) => {
+              if (user.position.lat) {
+                return (
+                  <>
+                    <Marker key={user.id} position={user.position}>
+                      <Popup>{user.name}</Popup>
+                    </Marker>
+                    {user.restaurant && (
+                      <>
+                        <Polyline
+                          pathOptions={{ color: "red" }}
+                          positions={[user.position, user.restaurant.position]}
+                        />
+                        <Marker position={user.restaurant.position}>
+                          <Popup>{user.restaurant.name}</Popup>
+                        </Marker>
+                        <Polyline
+                          pathOptions={{ color: "red" }}
+                          positions={[user.restaurant.position, finalPosition]}
+                        />
+                      </>
+                    )}
+                  </>
+                );
+              }
+            })}
+            <Marker
+              position={finalPosition}
+              draggable={true}
+              eventHandlers={eventHandlers}
+            >
+              <Popup>Final Position</Popup>
+            </Marker>
+          </>
+        )}
       </MapContainer>
+
+      <div className="map-distances"></div>
     </div>
   );
 };

@@ -16,6 +16,7 @@ export const Home = () => {
       lng: 0,
     },
   });
+  const [users, setUsers] = useState<User[]>([]);
 
   const handleRestaurantClick = (restaurant: RestaurantKeys) => {
     setSelectedRestaurant(restaurant);
@@ -26,6 +27,10 @@ export const Home = () => {
     setCurrentUser(user);
   };
 
+  const handleNewUsers = (users: User[]) => {
+    setUsers(users);
+  };
+
   return (
     <div className="home-container">
       <Restaurants
@@ -33,8 +38,16 @@ export const Home = () => {
         selectedRestaurant={selectedRestaurant}
         setSelectedRestaurant={setSelectedRestaurant}
       />
-      <Map selectedRestaurant={selectedRestaurant} currentUser={currentUser} />
-      <Room onUserChange={handleUserChange} currentUser={currentUser} />
+      <Map
+        selectedRestaurant={selectedRestaurant}
+        currentUser={currentUser}
+        users={users}
+      />
+      <Room
+        onUserChange={handleUserChange}
+        currentUser={currentUser}
+        setNewUsers={handleNewUsers}
+      />
     </div>
   );
 };
