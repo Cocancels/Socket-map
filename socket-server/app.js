@@ -1,11 +1,11 @@
 const express = require("express");
 const http = require("http");
-const socketIo = require("socket.io"(server, {
+const socketIo = require("socket.io", {
   cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
-}));
+});
 
 const port = process.env.PORT || 4001;
 const index = require("./index");
@@ -15,32 +15,26 @@ app.use(index);
 
 const server = http.createServer(app);
 
+const users = [];
+
 const io = socketIo(server);
 
-const fakeUsers = [
-  { id: 1, name: "John" },
-  { id: 2, name: "Mike" },
-  { id: 3, name: "Mary" },
-];
-
 io.on("connection", (socket) => {
-  console.log("New client connected");
+  socket.join("room1");
+  io.to("room1").emit("getUsers", users);
 
-  // if socket listen to "join-room" event, then do something
-  socket.on("join-room", (roomId, userId) => {
-    console.log("join-room", roomId, userId);
-    socket.join(roomId);
-    socket.to(roomId).broadcast.emit("user-connected", userId);
-  });
+  socket.on("newUser", (username) => {
+    const newUser = {
+      id: users.length,
+      name: username,
+      socketId: socket.id,
+      restaurant: {},
+    };
 
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
+    users.push(newUser);
+    io.to("room1").emit("userJoined", users);
+    io.to("room1").emit("userData", newUser);
   });
 });
-
-const getApiAndEmit = (socket) => {
-  const response = new Date();
-  socket.emit("FromAPI", response);
-};
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
