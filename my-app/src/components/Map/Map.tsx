@@ -8,7 +8,7 @@ import {
 import "./map.css";
 import "leaflet/dist/leaflet.css";
 
-import L, { LatLngExpression } from "leaflet";
+import L from "leaflet";
 import { useEffect, useMemo, useState } from "react";
 import { RestaurantKeys } from "../../interfaces/Restaurant";
 import { User } from "../Room/Room";
@@ -23,12 +23,13 @@ interface MapProps {
   selectedRestaurant: RestaurantKeys;
   currentUser: User | null;
   users: User[];
+  onUpdateCurrentPosition: (user: User) => void;
 }
 
 export const Map = (props: MapProps) => {
-  const { selectedRestaurant, currentUser, users } = props;
+  const { selectedRestaurant, currentUser, users, onUpdateCurrentPosition } = props;
 
-  const [position, setPosition] = useState<LatLngExpression>({
+  const [position, setPosition] = useState<any>({
     lat: 0,
     lng: 0,
   });
@@ -37,6 +38,7 @@ export const Map = (props: MapProps) => {
     lat: 5,
     lng: 5,
   });
+  const [distances, setDistances] = useState<any>([]);
 
   const getLocation = () => {
     if (navigator.geolocation) {
@@ -48,14 +50,14 @@ export const Map = (props: MapProps) => {
         setPosition(actualPosition);
         map.flyTo(actualPosition, 10, {
           duration: 2,
-        });
+        });      
+        onUpdateCurrentPosition({ ...(currentUser as User), position: actualPosition });
       });
     } else {
       alert("Geolocation is not supported by this browser.");
     }
   };
 
-  // function to get distance between two coordinates, in meters
   const getDistance = (
     lat1: number,
     lon1: number,
@@ -74,7 +76,7 @@ export const Map = (props: MapProps) => {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     const d = R * c; // in metres
-    return d;
+    return Math.round(d/1000);
   };
 
   const eventHandlers = useMemo(
@@ -89,9 +91,84 @@ export const Map = (props: MapProps) => {
     []
   );
 
+  const getUserRestaurantDistance = (user: User) => {
+    if(user.restaurant && user.restaurant.position && user.position.lat) {      
+      let letReturn = false
+
+      distances.forEach((distance: any) => {
+        if (distance.userId === user.id) {
+          console.log(user);
+          distance.distanceRestaurant = getDistance(
+            user.position.lat,
+            user.position.lng,
+            user.restaurant.position.lat,
+            user.restaurant.position.lng
+          );
+
+          distance.distanceRestaurantFinal = getDistance(
+            user.restaurant.position.lat,
+            user.restaurant.position.lng,
+            finalPosition.lat,
+            finalPosition.lng
+          );
+          
+          distance.distanceFinal = distance.distanceRestaurant + distance.distanceRestaurantFinal
+          setDistances([...distances]);
+          letReturn = true
+        }
+      });
+
+      if (letReturn) {
+        return
+      }
+    
+      const distanceRestaurant = getDistance(
+        user.position.lat,
+        user.position.lng,
+        user.restaurant.position.lat,
+        user.restaurant.position.lng
+      );
+
+      const distanceRestaurantFinal = getDistance(
+        user.restaurant.position.lat,
+        user.restaurant.position.lng,
+        finalPosition.lat,
+        finalPosition.lng
+      );
+
+
+      const newDistance = {
+        userId: user.id,
+        distanceRestaurant: distanceRestaurant,
+        distanceRestaurantFinal: distanceRestaurantFinal,
+        distanceTotal: distanceRestaurant + distanceRestaurantFinal,
+      }
+
+      const newDistances = distances
+      newDistances.push(newDistance)
+
+      setDistances(newDistances)
+    }
+  };
+  
+
   useEffect(() => {
-    getLocation();
+    !currentUser?.position.lat && getLocation();
+    currentUser?.position.lat && getUserRestaurantDistance(currentUser);
   }, [currentUser]);
+
+  useEffect(() => {
+    users.forEach((user) => {
+      if(user.id !== currentUser?.id) {
+        user.position.lat && getUserRestaurantDistance(user);
+      }
+    });
+  }, [users]);
+
+  useEffect(() => {
+    console.log(distances);
+  }, [distances]);
+
 
   return (
     <div className="map-container">
@@ -137,13 +214,13 @@ export const Map = (props: MapProps) => {
             )}
 
             {users.map((user) => {
-              if (user.position.lat) {
+              if (user.position.lat && user.id !== currentUser.id) {
                 return (
-                  <>
-                    <Marker key={user.id} position={user.position}>
+                  <div key={user.id}>
+                    <Marker  position={user.position}>
                       <Popup>{user.name}</Popup>
                     </Marker>
-                    {user.restaurant && (
+                    {user.restaurant.position && (
                       <>
                         <Polyline
                           pathOptions={{ color: "red" }}
@@ -158,7 +235,7 @@ export const Map = (props: MapProps) => {
                         />
                       </>
                     )}
-                  </>
+                  </div>
                 );
               }
             })}
@@ -173,7 +250,19 @@ export const Map = (props: MapProps) => {
         )}
       </MapContainer>
 
-      <div className="map-distances"></div>
+      <div className="map-distances">
+        {distances.map((distance: any, index: number) => {
+          const user = users.find((user) => user.id === distance.userId);
+          return (
+            <div key={index}>
+              <h3>{user?.name}</h3>
+              <p>To go to the restaurant {user?.restaurant.name}: {distance.distanceRestaurant} km</p>
+              <p>To go to the final position: {distance.distanceRestaurantFinal} km</p>
+              <p>Total: {distance.distanceTotal} km</p>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

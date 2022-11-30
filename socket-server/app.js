@@ -53,8 +53,35 @@ io.on("connection", (socket) => {
     };
 
     users.push(newUser);
-    io.to("room1").emit("userJoined", users);
-    io.to("room1").emit("userData", newUser);
+    io.to("room1").emit("newUser", users);
+  });
+
+  socket.on("updateCurrentUserPosition", ({
+    position,
+    user
+  }) => {
+    users.map((u) => {
+      if (u.id === user.id) {
+        u.position = position;
+      }
+    });
+
+    console.log(users);
+    
+    io.to("room1").emit("getUpdatedUserPosition", users);
+  });
+
+  socket.on("updateCurrentUserRestaurant", ({
+    restaurant,
+    user
+  }) => {
+    users.map((u) => {
+      if (u.id === user.id) {
+        u.restaurant = restaurant;
+      }
+    });
+    
+    io.to("room1").emit("getUpdatedUserRestaurant", users);
   });
 });
 

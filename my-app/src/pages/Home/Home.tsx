@@ -23,6 +23,16 @@ export const Home = () => {
     setCurrentUser({ ...(currentUser as User), restaurant: restaurant });
   };
 
+  const handleNewUser = (user: User) => {
+    setCurrentUser(user);
+    const thisUser = users.find((u) => u.id === user.id);
+    if (thisUser) {
+      setUsers(users.map((u) => (u.id === user.id ? user : u)));
+    } else {
+      setUsers([...users, user]);
+    }
+  };
+
   const handleUserChange = (user: User) => {
     setCurrentUser(user);
   };
@@ -41,11 +51,13 @@ export const Home = () => {
       <Map
         selectedRestaurant={selectedRestaurant}
         currentUser={currentUser}
-        users={users}
+        users={users} 
+        onUpdateCurrentPosition={handleNewUser}
       />
       <Room
-        onUserChange={handleUserChange}
+        setCurrentUser={handleUserChange}
         currentUser={currentUser}
+        selectedRestaurant={selectedRestaurant}
         setNewUsers={handleNewUsers}
       />
     </div>
