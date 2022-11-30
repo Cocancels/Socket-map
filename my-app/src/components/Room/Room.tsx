@@ -10,17 +10,23 @@ var socket = io("http://localhost:4001", {
 export interface User {
   id: number;
   name: string;
+  position: {
+    lat: number;
+    lng: number;
+  };
   socketId: number;
   restaurant: RestaurantKeys;
 }
 
 interface RoomProps {
-  onUserChange: (user: User) => void;
+  setCurrentUser: (user: User) => void;
   currentUser: User | null;
+  setNewUsers: (users: User[]) => void;
+  selectedRestaurant: RestaurantKeys;
 }
 
 export const Room = (props: RoomProps) => {
-  const { onUserChange, currentUser } = props;
+  const { currentUser, setNewUsers, setCurrentUser, selectedRestaurant } = props;
   const [users, setUsers] = useState<User[]>([]);
   const [username, setUsername] = useState("");
   const [isInRoom, setIsInRoom] = useState(false);
@@ -32,21 +38,47 @@ export const Room = (props: RoomProps) => {
   useEffect(() => {
     socket.on("getUsers", (users: User[]) => {
       setUsers(users);
+      setNewUsers(users);
     });
 
-    socket.on("userJoined", (users: User[]) => {
+    socket.on("newUser", (users: User[]) => {
       setUsers(users);
-      setIsInRoom(true);
+      setNewUsers(users);
+      setCurrentUser(users[users.length - 1]);
     });
 
-    socket.on("userData", (user: User) => {
-      onUserChange(user);
+    socket.on("getUpdatedUserRestaurant", (users: User[]) => {
+      setUsers(users);
+      setNewUsers(users);
+    });
+
+    socket.on("getUpdatedUserPosition", (users: User[]) => {
+      setUsers(users);
+      setNewUsers(users);
     });
   }, []);
 
   useEffect(() => {
-    console.log("currentUser", currentUser);
+    if (currentUser) {
+      socket.emit("updateCurrentUser", currentUser);
+    }
+
+    if(currentUser?.position.lat){
+      socket.emit("updateCurrentUserPosition", {
+        position: currentUser.position,
+        user: currentUser,
+      });
+    }
   }, [currentUser]);
+
+  useEffect(() => {
+    if (selectedRestaurant.id !== 0) {
+      socket.emit("updateCurrentUserRestaurant", {
+        restaurant: selectedRestaurant,
+        user: currentUser,
+      });
+    }
+  }, [selectedRestaurant]);
 
   return (
     <div className="room-container">
@@ -62,6 +94,7 @@ export const Room = (props: RoomProps) => {
             />
             <button
               onClick={() => {
+                setIsInRoom(true);
                 socket.emit("newUser", username);
               }}
             >

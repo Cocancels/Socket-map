@@ -15,7 +15,27 @@ app.use(index);
 
 const server = http.createServer(app);
 
-const users = [];
+const users = [
+  {
+    id: 0,
+    name: "John",
+    socketId: 1,
+    position: {
+      lat: 65,
+      lng: 4,
+    },
+    restaurant: {
+      id: 1,
+      name: "Le Vieux Pressoir, Restaurant & Pizzeria",
+      image:
+        "https://lh5.googleusercontent.com/p/AF1QipP9DL1FNPTRMLFtCSfH_K85KDjNC__td4XlrGCH=w408-h306-k-no",
+      position: {
+        lat: 4.17707768049819,
+        lng: 6.13789117200385,
+      },
+    },
+  },
+];
 
 const io = socketIo(server);
 
@@ -29,11 +49,39 @@ io.on("connection", (socket) => {
       name: username,
       socketId: socket.id,
       restaurant: {},
+      position: {},
     };
 
     users.push(newUser);
-    io.to("room1").emit("userJoined", users);
-    io.to("room1").emit("userData", newUser);
+    io.to("room1").emit("newUser", users);
+  });
+
+  socket.on("updateCurrentUserPosition", ({
+    position,
+    user
+  }) => {
+    users.map((u) => {
+      if (u.id === user.id) {
+        u.position = position;
+      }
+    });
+
+    console.log(users);
+    
+    io.to("room1").emit("getUpdatedUserPosition", users);
+  });
+
+  socket.on("updateCurrentUserRestaurant", ({
+    restaurant,
+    user
+  }) => {
+    users.map((u) => {
+      if (u.id === user.id) {
+        u.restaurant = restaurant;
+      }
+    });
+    
+    io.to("room1").emit("getUpdatedUserRestaurant", users);
   });
 });
 

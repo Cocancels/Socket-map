@@ -16,14 +16,29 @@ export const Home = () => {
       lng: 0,
     },
   });
+  const [users, setUsers] = useState<User[]>([]);
 
   const handleRestaurantClick = (restaurant: RestaurantKeys) => {
     setSelectedRestaurant(restaurant);
     setCurrentUser({ ...(currentUser as User), restaurant: restaurant });
   };
 
+  const handleNewUser = (user: User) => {
+    setCurrentUser(user);
+    const thisUser = users.find((u) => u.id === user.id);
+    if (thisUser) {
+      setUsers(users.map((u) => (u.id === user.id ? user : u)));
+    } else {
+      setUsers([...users, user]);
+    }
+  };
+
   const handleUserChange = (user: User) => {
     setCurrentUser(user);
+  };
+
+  const handleNewUsers = (users: User[]) => {
+    setUsers(users);
   };
 
   return (
@@ -33,8 +48,18 @@ export const Home = () => {
         selectedRestaurant={selectedRestaurant}
         setSelectedRestaurant={setSelectedRestaurant}
       />
-      <Map selectedRestaurant={selectedRestaurant} currentUser={currentUser} />
-      <Room onUserChange={handleUserChange} currentUser={currentUser} />
+      <Map
+        selectedRestaurant={selectedRestaurant}
+        currentUser={currentUser}
+        users={users} 
+        onUpdateCurrentPosition={handleNewUser}
+      />
+      <Room
+        setCurrentUser={handleUserChange}
+        currentUser={currentUser}
+        selectedRestaurant={selectedRestaurant}
+        setNewUsers={handleNewUsers}
+      />
     </div>
   );
 };
