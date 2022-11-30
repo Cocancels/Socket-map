@@ -1,15 +1,25 @@
 import "./restaurants.css";
+import { RestaurantKeys } from "../../interfaces/Restaurant";
+import { useState } from "react";
 
-export const Restaurant = (props : any) => {
+interface RestaurantProps {
+  selected: boolean;
+  restaurant: RestaurantKeys;
+  onRestaurantClick: (restaurant: RestaurantKeys) => void;
+}
 
-    const {restaurant } = props
+export const Restaurant = (props: RestaurantProps) => {
+  const { restaurant, onRestaurantClick, selected } = props;
 
-    console.log(restaurant)
+  const handleRestaurantClick = () => {
+    onRestaurantClick(restaurant);
+  };
 
-    return (
-        <div className="restaurant-container">
-            <p>{restaurant.name}</p>
-            <img src={restaurant.image} alt=""/>
-        </div>
-    );
+  return (
+    <div className="restaurant-container" onClick={handleRestaurantClick}>
+      <p>{restaurant.name}</p>
+      <img src={restaurant.image} alt="" />
+      {selected && <p>Selected</p>}
+    </div>
+  );
 };
