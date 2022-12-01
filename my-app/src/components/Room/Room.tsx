@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./room.css";
 import { io } from "socket.io-client";
 import { RestaurantKeys } from "../../interfaces/Restaurant";
+import {RoomList} from "./RoomList";
 
 var socket = io("http://localhost:4001", {
   transports: ["websocket", "polling", "flashsocket"],
@@ -24,6 +25,7 @@ export const Room = (props: RoomProps) => {
   const [users, setUsers] = useState<User[]>([]);
   const [username, setUsername] = useState("");
   const [isInRoom, setIsInRoom] = useState(false);
+  const [rooms, setRooms] = useState([]);
 
   const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
@@ -31,12 +33,19 @@ export const Room = (props: RoomProps) => {
 
   useEffect(() => {
     socket.on("getUsers", (users: User[]) => {
+      console.log(users)
       setUsers(users);
     });
 
     socket.on("userJoined", (users: User[]) => {
+      console.log("oui")
       setUsers(users);
       setIsInRoom(true);
+    });
+
+    socket.on("roomData", (rooms) => {
+      setRooms(rooms);
+      console.log(rooms)
     });
 
     socket.on("userData", (user: User) => {
@@ -46,7 +55,9 @@ export const Room = (props: RoomProps) => {
 
   useEffect(() => {
     console.log("currentUser", currentUser);
-  }, [currentUser]);
+    console.log("Rooms", rooms)
+
+  }, [rooms]);
 
   return (
     <div className="room-container">
@@ -60,14 +71,20 @@ export const Room = (props: RoomProps) => {
               value={username}
               onChange={handleUsernameChange}
             />
+
+            <h3>Create room</h3>
             <button
               onClick={() => {
                 socket.emit("newUser", username);
               }}
             >
-              Join Room
+              Create
             </button>
+
+            <h3>Join room</h3>
+            <RoomList rooms={rooms} username={username}></RoomList>
           </>
+
         )}
         {isInRoom && (
           <div className="users">
@@ -82,6 +99,8 @@ export const Room = (props: RoomProps) => {
             ))}
           </div>
         )}
+
+
       </div>
     </div>
   );
