@@ -295,7 +295,7 @@ export const Map = (props: MapProps) => {
                     <Marker position={user.position}>
                       <Popup>{user.name}</Popup>
                     </Marker>
-                    {user.restaurant.position && (
+                    {user.restaurant.position ? (
                       <>
                         <Polyline
                           pathOptions={{ color: "red" }}
@@ -309,6 +309,11 @@ export const Map = (props: MapProps) => {
                           positions={[user.restaurant.position, finalPosition]}
                         />
                       </>
+                    ) : (
+                      <Polyline
+                        pathOptions={{ color: "red" }}
+                        positions={[user.position, finalPosition]}
+                      />
                     )}
                   </div>
                 );
@@ -331,20 +336,21 @@ export const Map = (props: MapProps) => {
           return (
             <div key={index}>
               <h3>{user?.name}</h3>
-              {distance.distanceRestaurant && distance.distanceRestaurantFinal && (
-                <>
-                  <p>
-                    To go to the restaurant {user?.restaurant.name}:{" "}
-                    <strong>{distance.timeRestaurant} hours</strong> for{" "}
-                    {distance.distanceRestaurant} km
-                  </p>
-                  <p>
-                    To go to the final position:{" "}
-                    <strong>{distance.distanceRestaurantFinal} km</strong> in{" "}
-                    <strong>{distance.timeRestaurantFinal} hours</strong>
-                  </p>
-                </>
-              )}
+              {distance.distanceRestaurant &&
+                distance.distanceRestaurantFinal && (
+                  <>
+                    <p>
+                      To go to the restaurant {user?.restaurant.name}:{" "}
+                      <strong>{distance.timeRestaurant} hours</strong> for{" "}
+                      {distance.distanceRestaurant} km
+                    </p>
+                    <p>
+                      To go to the final position:{" "}
+                      <strong>{distance.distanceRestaurantFinal} km</strong> in{" "}
+                      <strong>{distance.timeRestaurantFinal} hours</strong>
+                    </p>
+                  </>
+                )}
               <p>
                 Total: <strong>{distance.distanceTotal} </strong>km in{" "}
                 <strong>{distance.timeTotal} hours </strong>

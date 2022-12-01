@@ -1,4 +1,22 @@
 .room-container {
   width: 30%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.room-content {
+  height: 100%;
+}
+
+.users {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.user {
   height: 100%;
 }

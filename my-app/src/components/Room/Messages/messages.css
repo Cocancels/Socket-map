@@ -1,0 +1,101 @@
+.messages-container {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background-color: #ffffff;
+  font-size: 12px;
+}
+
+.messages-container p {
+  margin: 0;
+  padding: 0;
+}
+
+.messages-header {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #4963b1;
+  color: white;
+  border-bottom: 1px solid #e0e0e0;
+  border-top: 1px solid #e0e0e0;
+}
+
+.messages-content {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: #c9dde965;
+  height: 500px;
+}
+
+.message,
+.currentUser-message {
+  min-width: 30%;
+  max-width: 80%;
+  width: auto;
+  background-color: #1b89f0;
+  margin: 10px 0px;
+  border-radius: 10px;
+  color: #ffffff;
+}
+
+.currentUser-message {
+  align-self: flex-end;
+  justify-self: flex-end;
+  background-color: rgb(21, 182, 48);
+}
+
+.message-header {
+  width: 90%;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0px;
+}
+
+.message-username {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.message-content {
+  width: 90%;
+  text-align: left;
+  margin: auto;
+  padding: 10px;
+}
+
+.message-input {
+  width: 100%;
+  display: flex;
+}
+
+.message-input input {
+  width: 80%;
+  height: 50px;
+  border: none;
+  border-radius: 10px;
+  padding: 0px 10px;
+  font-size: 14px;
+}
+
+.message-input button {
+  width: 20%;
+  height: 50px;
+  border: none;
+  background-color: #1b89f0;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.message-input button:hover {
+  background-color: #0f6ec0;
+}
