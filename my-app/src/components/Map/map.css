@@ -5,5 +5,10 @@
 
 .leaflet-container {
   width: 100%;
-  height: 600px;
+  height: 55vh;
+}
+
+.map-distances {
+  height: 35vh;
+  overflow-y: scroll;
 }
