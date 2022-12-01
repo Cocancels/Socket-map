@@ -13,6 +13,13 @@ const index = require("./index");
 const app = express();
 app.use(index);
 
+app.use(function (req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Credentials", true);
+  next();
+});
 const server = http.createServer(app);
 
 const rooms = {};
@@ -29,8 +36,11 @@ io.on("connection", (socket) => {
 
   console.log("New client connected", socket.room);
 
-  if (!rooms[socket.room]) {
+  // if (!rooms[socket.room]) {
+  if (socket.room === "default") {
+    socket.room = "room" + Object.keys(rooms).length;
     rooms[socket.room] = {
+      name: socket.room,
       users: [],
       finalPosition: {
         lat: 0,

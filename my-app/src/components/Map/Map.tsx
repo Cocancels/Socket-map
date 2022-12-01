@@ -12,17 +12,11 @@ import L from "leaflet";
 import { useEffect, useMemo, useState } from "react";
 import { RestaurantKeys } from "../../interfaces/Restaurant";
 import { User } from "../Room/Room";
-import { io } from "socket.io-client";
 
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
   iconUrl: require("leaflet/dist/images/marker-icon.png"),
   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
-});
-
-var socket = io("http://localhost:4001", {
-  transports: ["websocket", "polling", "flashsocket"],
-  autoConnect: false,
 });
 
 interface MapProps {
