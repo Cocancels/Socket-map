@@ -23,7 +23,10 @@ export const Messages = (props: MessagesProps) => {
     const newDate = new Date(date);
     const hours = newDate.getHours();
     const minutes = newDate.getMinutes();
-    return `${hours}:${minutes}`;
+
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+    return `${hours}:${formattedMinutes}`;
   };
 
   return (
