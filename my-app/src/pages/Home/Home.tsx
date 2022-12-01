@@ -30,6 +30,7 @@ export const Home = () => {
     lat: 0,
     lng: 0,
   });
+  const [messages, setMessages] = useState<any[]>([]);
 
   const prevFinalPosition: any = usePrevious(finalPosition);
 
@@ -49,7 +50,6 @@ export const Home = () => {
   };
 
   const connectToSocket = (username: string, thisRoom: string) => {
-    console.log(username);
     socket.auth = {
       username: username,
       room: thisRoom.length > 0 ? thisRoom : "default",
@@ -58,6 +58,7 @@ export const Home = () => {
 
     socket.on("init", (room: any) => {
       setUsers(room.users);
+      setMessages(room.messages);
       setCurrentUser(room.currentUser);
     });
 
@@ -76,6 +77,15 @@ export const Home = () => {
     socket.on("getFinalPosition", (finalPos: any) => {
       setFinalPosition(finalPos);
     });
+
+    socket.on("newMessage", (messages: any[]) => {
+      console.log("newMessage", messages);
+      setMessages(messages);
+    });
+  };
+
+  const onSendMessage = (message: string, user: User) => {
+    socket.emit("sendMessage", message, user);
   };
 
   useEffect(() => {
@@ -150,6 +160,8 @@ export const Home = () => {
         }}
         rooms={rooms}
         room={room}
+        messages={messages}
+        onSendMessage={onSendMessage}
       />
     </div>
   );
