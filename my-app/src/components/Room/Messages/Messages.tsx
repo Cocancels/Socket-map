@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { User } from "../Room";
+import "./messages.css";
 
 interface Message {
   message: string;
@@ -18,7 +19,6 @@ export const Messages = (props: MessagesProps) => {
 
   const [message, setMessage] = useState("");
 
-  // function to transform date to proper format
   const formatDate = (date: string) => {
     const newDate = new Date(date);
     const hours = newDate.getHours();
@@ -28,26 +28,46 @@ export const Messages = (props: MessagesProps) => {
 
   return (
     <div className="messages-container">
-      <input
-        type="text"
-        value={message}
-        placeholder="Enter your message"
-        onChange={(e) => setMessage(e.target.value)}
-      />
-      <button onClick={() => onSendMessage(message, currentUser as User)}>
-        Send
-      </button>
+      <div className="messages-header">
+        <h2>Messages</h2>
+      </div>
       <div className="messages-content">
-        {messages.map((message, index) => (
-          <div key={index} className="message">
-            <p>
-              <strong>
-                {message.user.name} at {formatDate(message.createdAt)} :
-              </strong>{" "}
-              {message.message}
-            </p>
-          </div>
-        ))}
+        {messages.map((message, index) => {
+          return (
+            <div
+              key={index}
+              className={
+                message.user.id === currentUser?.id
+                  ? "currentUser-message"
+                  : "message"
+              }
+            >
+              <div className="message-header">
+                <p className="message-username">{message.user.name}</p>
+                <p>{formatDate(message.createdAt)}</p>
+              </div>
+              <div className="message-content">
+                <p>{message.message}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="message-input">
+        <input
+          type="text"
+          value={message}
+          placeholder="Enter your message"
+          onChange={(e) => setMessage(e.target.value)}
+        />
+        <button
+          onClick={() => {
+            onSendMessage(message, currentUser as User);
+            setMessage("");
+          }}
+        >
+          Send
+        </button>
       </div>
     </div>
   );
