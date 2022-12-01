@@ -41,24 +41,31 @@ export const Room = (props: RoomProps) => {
 
   return (
     <div className="room-container">
-      <h1>Room</h1>
+      <h3>Room</h3>
+
       <div className="room-content">
         {!isInRoom && (
           <>
-            <input
-              type="text"
-              placeholder="Enter your name"
-              value={username}
-              onChange={handleUsernameChange}
-            />
-            <button
-              onClick={() => {
-                onCreateUser(username);
-                setIsInRoom(true);
-              }}
-            >
-              Create Room
-            </button>
+            <div className="createRoom">
+              <label htmlFor="username">Pseudo</label>
+              <input
+                  name="username"
+                  type="text"
+                  placeholder="Enter your name"
+                  value={username}
+                  onChange={handleUsernameChange}
+                  className="form-control mt-3 mb-3"
+              />
+              <button className="btn btn-primary w-100"
+                  onClick={() => {
+                    onCreateUser(username);
+                    setIsInRoom(true);
+                  }}
+              >
+                Create
+              </button>
+            </div>
+
             <RoomList
               username={username}
               rooms={rooms}
@@ -71,7 +78,6 @@ export const Room = (props: RoomProps) => {
           <div className="users">
             {users.map(
               (user, index) => (
-                console.log(user),
                 (
                   <div key={index} className="user">
                     <p

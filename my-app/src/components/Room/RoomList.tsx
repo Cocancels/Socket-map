@@ -26,19 +26,22 @@ export const RoomList = (props: RoomListProps) => {
   };
 
   return (
-    <div className="users">
+    <div className="mt-3 list-group p-3">
       {rooms.length > 0 &&
         room.length === 0 &&
         rooms.map((room: any, index: any) => (
-          <div key={index}>
-            <p>{formatRoomName(room.name)}</p>
-            <button
-              onClick={() => {
-                onSelectRoom(username, room.name);
-              }}
-            >
-              Join {formatRoomName(room.name)}
-            </button>
+          <div key={index} className="row mb-3 list-group-item">
+            <div className="d-flex align-items-center">
+              <p className="col-md-6 mb-0">{formatRoomName(room.name)}</p>
+              <button className="btn btn-success col-md-6"
+                      onClick={() => {
+                        onSelectRoom(username, room.name);
+                      }}
+              >
+                Join
+              </button>
+            </div>
+
           </div>
         ))}
     </div>

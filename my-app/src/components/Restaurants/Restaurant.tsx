@@ -16,7 +16,7 @@ export const Restaurant = (props: RestaurantProps) => {
   };
 
   return (
-    <div className="restaurant-container" onClick={handleRestaurantClick}>
+    <div className="restaurant-container list-group-item" onClick={handleRestaurantClick}>
       <p>{restaurant.name}</p>
       <img src={restaurant.image} alt="" />
       {selected && <p>Selected</p>}

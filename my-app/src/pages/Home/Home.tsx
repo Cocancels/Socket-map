@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { RestaurantKeys } from "../../interfaces/Restaurant";
 import { io } from "socket.io-client";
 import { usePrevious } from "../../hooks/usePrevious";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 var socket = io("http://localhost:4001", {
   transports: ["websocket", "polling", "flashsocket"],

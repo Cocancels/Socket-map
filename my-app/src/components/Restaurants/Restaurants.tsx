@@ -30,9 +30,9 @@ export const Restaurants = (props: RestaurantsProps) => {
   };
   return (
     <div className="restaurants-section">
-      <h1>Restaurants</h1>
+      <h3>Restaurants</h3>
 
-      <div className="restaurants-container">
+      <div className="restaurants-container list-group">
         {renderListOfRestaurants(restaurants)}
       </div>
     </div>

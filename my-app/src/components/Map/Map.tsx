@@ -247,7 +247,7 @@ export const Map = (props: MapProps) => {
 
   return (
     <div className="map-container">
-      <h1>Map</h1>
+      <h3>Map</h3>
 
       <MapContainer
         center={position}
