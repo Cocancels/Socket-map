@@ -82,6 +82,10 @@ export const Home = () => {
       console.log("newMessage", messages);
       setMessages(messages);
     });
+
+    socket.on("disconnect", () => {
+      socket.disconnect();
+    });
   };
 
   const onSendMessage = (message: string, user: User) => {
@@ -134,6 +138,14 @@ export const Home = () => {
     }
   };
 
+  const handleUserLeave = (user: User) => {
+    socket.emit("leaveRoom", user);
+    socket.disconnect();
+    setRoom("");
+    getAllRooms();
+    setCurrentUser(null);
+  };
+
   return (
     <div className="home-container">
       <Restaurants
@@ -162,6 +174,7 @@ export const Home = () => {
         room={room}
         messages={messages}
         onSendMessage={onSendMessage}
+        onUserLeave={handleUserLeave}
       />
     </div>
   );

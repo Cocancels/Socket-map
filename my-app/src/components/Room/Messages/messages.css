@@ -26,7 +26,7 @@
 }
 
 .messages-content {
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
@@ -38,7 +38,7 @@
 .message,
 .currentUser-message {
   min-width: 30%;
-  max-width: 80%;
+  max-width: 70%;
   width: auto;
   background-color: #1b89f0;
   margin: 10px 0px;
@@ -46,9 +46,12 @@
   color: #ffffff;
 }
 
+.message {
+  align-self: flex-start;
+}
+
 .currentUser-message {
   align-self: flex-end;
-  justify-self: flex-end;
   background-color: rgb(21, 182, 48);
 }
 
