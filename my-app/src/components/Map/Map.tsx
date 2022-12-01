@@ -22,6 +22,7 @@ L.Icon.Default.mergeOptions({
 
 var socket = io("http://localhost:4001", {
   transports: ["websocket", "polling", "flashsocket"],
+  autoConnect: false,
 });
 
 interface MapProps {
@@ -29,22 +30,28 @@ interface MapProps {
   currentUser: User | null;
   users: User[];
   onUpdateCurrentPosition: (user: User) => void;
-  // onUpdateUsers: (users: User[]) => void;
+  finalPosition: {
+    lat: number;
+    lng: number;
+  };
+  setFinalPosition: (pos: any) => void;
 }
 
 export const Map = (props: MapProps) => {
-  const { selectedRestaurant, currentUser, users, onUpdateCurrentPosition } =
-    props;
+  const {
+    selectedRestaurant,
+    currentUser,
+    users,
+    onUpdateCurrentPosition,
+    finalPosition,
+    setFinalPosition,
+  } = props;
 
   const [position, setPosition] = useState<any>({
     lat: 0,
     lng: 0,
   });
   const [map, setMap] = useState<any>();
-  const [finalPosition, setFinalPosition] = useState<any>({
-    lat: 5,
-    lng: 5,
-  });
 
   const [distances, setDistances] = useState<any>([]);
 
@@ -96,7 +103,6 @@ export const Map = (props: MapProps) => {
         const marker = e.target;
         if (marker != null) {
           setFinalPosition(marker.getLatLng());
-          socket.emit("updateFinalPosition", marker.getLatLng());
         }
       },
     }),
@@ -220,11 +226,7 @@ export const Map = (props: MapProps) => {
     return time;
   };
 
-  useEffect(() => {
-    socket.on("getFinalPosition", (finalPos: any) => {
-      setFinalPosition(finalPos);
-    });
-  }, []);
+  useEffect(() => {}, []);
 
   useEffect(() => {
     currentUser && !currentUser?.position.lat && getLocation();
@@ -232,7 +234,6 @@ export const Map = (props: MapProps) => {
   }, [currentUser]);
 
   useEffect(() => {
-    console.log("users", users);
     users.forEach((user) => {
       if (user.id !== currentUser?.id) {
         user.position.lat && getUserRestaurantDistance(user);
@@ -294,7 +295,7 @@ export const Map = (props: MapProps) => {
             )}
 
             {users.map((user) => {
-              if (user.position.lat && user.id !== currentUser.id) {
+              if (user.position.lat) {
                 return (
                   <div key={user.id}>
                     <Marker position={user.position}>
