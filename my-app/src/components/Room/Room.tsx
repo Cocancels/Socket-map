@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./room.css";
 import { RestaurantKeys } from "../../interfaces/Restaurant";
 import { RoomList } from "./RoomList";
+import { Messages } from "./Messages/Messages";
 
 export interface User {
   id: number;
@@ -22,10 +23,21 @@ interface RoomProps {
   rooms: any[];
   room: string;
   onSelectRoom: (username: string, room: any) => void;
+  onSendMessage: (message: string, user: User) => void;
+  messages: any[];
 }
 
 export const Room = (props: RoomProps) => {
-  const { currentUser, users, onCreateUser, room, rooms, onSelectRoom } = props;
+  const {
+    currentUser,
+    users,
+    onCreateUser,
+    room,
+    rooms,
+    onSelectRoom,
+    onSendMessage,
+    messages,
+  } = props;
   const [username, setUsername] = useState("");
   const [isInRoom, setIsInRoom] = useState(false);
 
@@ -69,22 +81,20 @@ export const Room = (props: RoomProps) => {
         )}
         {isInRoom && (
           <div className="users">
-            {users.map(
-              (user, index) => (
-                console.log(user),
-                (
-                  <div key={index} className="user">
-                    <p
-                      style={
-                        currentUser?.id === user.id ? { color: "green" } : {}
-                      }
-                    >
-                      {user.name}
-                    </p>
-                  </div>
-                )
-              )
-            )}
+            {users.map((user, index) => (
+              <div key={index} className="user">
+                <p
+                  style={currentUser?.id === user.id ? { color: "green" } : {}}
+                >
+                  {user.name}
+                </p>
+              </div>
+            ))}
+            <Messages
+              messages={messages}
+              onSendMessage={onSendMessage}
+              currentUser={currentUser}
+            />
           </div>
         )}
       </div>

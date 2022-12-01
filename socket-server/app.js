@@ -34,13 +34,11 @@ io.on("connection", (socket) => {
   socket.room = socket.handshake.auth.room;
   socket.username = socket.handshake.auth.username;
 
-  console.log("New client connected", socket.room);
-
-  // if (!rooms[socket.room]) {
   if (socket.room === "default") {
     socket.room = "room" + Object.keys(rooms).length;
     rooms[socket.room] = {
       name: socket.room,
+      messages: [],
       users: [],
       finalPosition: {
         lat: 0,
@@ -63,7 +61,26 @@ io.on("connection", (socket) => {
   rooms[socket.room].users.push(newUser);
   io.to(socket.room).emit("newUser", rooms[socket.room].users);
 
+  const joinMessage = {
+    user: newUser,
+    message: `I just joined the room !`,
+    createdAt: new Date(),
+  };
+
   socket.join(socket.room);
+
+  rooms[socket.room].messages.push(joinMessage);
+  io.to(socket.room).emit("newMessage", rooms[socket.room].messages);
+
+  socket.on("sendMessage", (message, user) => {
+    const newMessage = {
+      user: user,
+      message: message,
+      createdAt: new Date(),
+    };
+    rooms[socket.room].messages.push(newMessage);
+    io.to(socket.room).emit("newMessage", rooms[socket.room].messages);
+  });
 
   socket.on("updateCurrentUserPosition", ({ position, user }) => {
     rooms[socket.room].users.map((u) => {
@@ -94,6 +111,23 @@ io.on("connection", (socket) => {
       lng: finalPos.lng,
     };
     io.to(socket.room).emit("getFinalPosition", finalPosition);
+  });
+
+  socket.on("disconnect", () => {
+    const leftMessage = newUser.name + " has left the room";
+    const time = new Date();
+    const newMessage = {
+      user: newUser,
+      message: leftMessage,
+      createdAt: time,
+    };
+    rooms[socket.room].messages.push(newMessage);
+    io.to(socket.room).emit("newMessage", rooms[socket.room].messages);
+
+    rooms[socket.room].users = rooms[socket.room].users.filter(
+      (user) => user.id !== newUser.id
+    );
+    io.to(socket.room).emit("newUser", rooms[socket.room].users);
   });
 });
 
