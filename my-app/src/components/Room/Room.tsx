@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./room.css";
 import { RestaurantKeys } from "../../interfaces/Restaurant";
+import { RoomList } from "./RoomList";
 
 export interface User {
   id: number;
@@ -18,10 +19,13 @@ interface RoomProps {
   selectedRestaurant: RestaurantKeys;
   users: User[];
   onCreateUser: (username: string) => void;
+  rooms: any[];
+  room: string;
+  onSelectRoom: (username: string, room: any) => void;
 }
 
 export const Room = (props: RoomProps) => {
-  const { currentUser, selectedRestaurant, users, onCreateUser } = props;
+  const { currentUser, users, onCreateUser, room, rooms, onSelectRoom } = props;
   const [username, setUsername] = useState("");
   const [isInRoom, setIsInRoom] = useState(false);
 
@@ -29,7 +33,11 @@ export const Room = (props: RoomProps) => {
     setUsername(event.target.value);
   };
 
-  useEffect(() => {}, [selectedRestaurant]);
+  useEffect(() => {
+    if (room.length > 0) {
+      setIsInRoom(true);
+    }
+  }, [room]);
 
   return (
     <div className="room-container">
@@ -45,25 +53,38 @@ export const Room = (props: RoomProps) => {
             />
             <button
               onClick={() => {
-                setIsInRoom(true);
                 onCreateUser(username);
+                setIsInRoom(true);
               }}
             >
-              Join Room
+              Create Room
             </button>
+            <RoomList
+              username={username}
+              rooms={rooms}
+              onSelectRoom={onSelectRoom}
+              room={room}
+            />
           </>
         )}
         {isInRoom && (
           <div className="users">
-            {users.map((user, index) => (
-              <div key={index} className="user">
-                <p
-                  style={currentUser?.id === user.id ? { color: "green" } : {}}
-                >
-                  {user.name}
-                </p>
-              </div>
-            ))}
+            {users.map(
+              (user, index) => (
+                console.log(user),
+                (
+                  <div key={index} className="user">
+                    <p
+                      style={
+                        currentUser?.id === user.id ? { color: "green" } : {}
+                      }
+                    >
+                      {user.name}
+                    </p>
+                  </div>
+                )
+              )
+            )}
           </div>
         )}
       </div>

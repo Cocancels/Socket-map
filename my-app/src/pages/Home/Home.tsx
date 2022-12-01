@@ -24,7 +24,8 @@ export const Home = () => {
     },
   });
   const [users, setUsers] = useState<User[]>([]);
-  const [room, setRoom] = useState("Room 1");
+  const [room, setRoom] = useState("");
+  const [rooms, setRooms] = useState<any[]>([]);
   const [finalPosition, setFinalPosition] = useState({
     lat: 0,
     lng: 0,
@@ -32,10 +33,26 @@ export const Home = () => {
 
   const prevFinalPosition: any = usePrevious(finalPosition);
 
-  const connectToSocket = (username: string) => {
+  const getAllRooms = () => {
+    fetch("http://localhost:4001/rooms", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // dict to array
+        const rooms = Object.keys(data).map((key) => data[key]);
+        setRooms(rooms);
+      });
+  };
+
+  const connectToSocket = (username: string, thisRoom: string) => {
+    console.log(username);
     socket.auth = {
       username: username,
-      room: room,
+      room: thisRoom.length > 0 ? thisRoom : "default",
     };
     socket.connect();
 
@@ -79,6 +96,10 @@ export const Home = () => {
     }
   }, [finalPosition]);
 
+  useEffect(() => {
+    getAllRooms();
+  }, []);
+
   const handleRestaurantClick = (restaurant: RestaurantKeys) => {
     setSelectedRestaurant(restaurant);
     setCurrentUser({ ...(currentUser as User), restaurant: restaurant });
@@ -86,7 +107,7 @@ export const Home = () => {
 
   const handleNewUser = (user: User) => {
     setCurrentUser(user);
-    console.log(user);
+
     const thisUser = users.find((u) => u.id === user.id);
     if (thisUser) {
       socket.emit("updateCurrentUserPosition", {
@@ -122,7 +143,13 @@ export const Home = () => {
         users={users}
         currentUser={currentUser}
         selectedRestaurant={selectedRestaurant}
-        onCreateUser={connectToSocket}
+        onCreateUser={(u: any) => connectToSocket(u, room)}
+        onSelectRoom={(username: string, room: string) => {
+          setRoom(room);
+          connectToSocket(username, room);
+        }}
+        rooms={rooms}
+        room={room}
       />
     </div>
   );
