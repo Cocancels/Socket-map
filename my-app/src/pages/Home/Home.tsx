@@ -27,10 +27,11 @@ export const Home = () => {
   const [room, setRoom] = useState("");
   const [rooms, setRooms] = useState<any[]>([]);
   const [finalPosition, setFinalPosition] = useState({
-    lat: 0,
-    lng: 0,
+    lat: 48.8531421,
+    lng: 2.2269321,
   });
   const [messages, setMessages] = useState<any[]>([]);
+  const [distances, setDistances] = useState<any[]>([]);
 
   const prevFinalPosition: any = usePrevious(finalPosition);
 
@@ -79,7 +80,6 @@ export const Home = () => {
     });
 
     socket.on("newMessage", (messages: any[]) => {
-      console.log("newMessage", messages);
       setMessages(messages);
     });
 
@@ -99,6 +99,7 @@ export const Home = () => {
         user: currentUser,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedRestaurant]);
 
   useEffect(() => {
@@ -108,6 +109,7 @@ export const Home = () => {
     ) {
       socket.emit("updateFinalPosition", finalPosition);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finalPosition]);
 
   useEffect(() => {
@@ -144,6 +146,7 @@ export const Home = () => {
     setRoom("");
     getAllRooms();
     setCurrentUser(null);
+    setDistances([]);
   };
 
   return (
@@ -160,6 +163,8 @@ export const Home = () => {
         onUpdateCurrentPosition={handleNewUser}
         setFinalPosition={setFinalPosition}
         finalPosition={finalPosition}
+        distances={distances}
+        setDistances={setDistances}
       />
       <Room
         users={users}
