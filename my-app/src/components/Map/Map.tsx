@@ -354,34 +354,38 @@ export const Map = (props: MapProps) => {
       </MapContainer>
 
       <div className="map-distances">
+        <h2>Distances</h2>
         {distances.map((distance: any, index: number) => {
           const user = users.find((user) => user.id === distance.userId);
           if (user) {
             return (
-              <div key={index}>
-                <h3>{user?.name}</h3>
-                {distance.distanceRestaurant &&
-                  distance.distanceRestaurantFinal && (
-                    <>
-                      <p>
-                        To go to the restaurant {user?.restaurant.name}:{" "}
-                        <strong>{distance.timeRestaurant} hours</strong> for{" "}
-                        {formatDistance(distance.distanceRestaurant)}
-                      </p>
-                      <p>
-                        To go to the final position:{" "}
-                        <strong>
-                          {formatDistance(distance.distanceRestaurantFinal)}
-                        </strong>{" "}
-                        in <strong>{distance.timeRestaurantFinal} hours</strong>
-                      </p>
-                    </>
-                  )}
-                <p>
-                  Total:{" "}
-                  <strong>{formatDistance(distance.distanceTotal)} </strong> in{" "}
-                  <strong>{distance.timeTotal} hours </strong>
-                </p>
+              <div key={index} className="map-distance">
+                <h3>User: {user?.name}</h3>
+                <div className="distances-container">
+                  {distance.distanceRestaurant &&
+                    distance.distanceRestaurantFinal && (
+                      <div className="distances-restaurant">
+                        <p>
+                          To go to the restaurant {user?.restaurant.name}:{" "}
+                          <strong>{distance.timeRestaurant} hours</strong> for{" "}
+                          {formatDistance(distance.distanceRestaurant)}
+                        </p>
+                        <p>
+                          To go to the final position:{" "}
+                          <strong>
+                            {formatDistance(distance.distanceRestaurantFinal)}
+                          </strong>{" "}
+                          in{" "}
+                          <strong>{distance.timeRestaurantFinal} hours</strong>
+                        </p>
+                      </div>
+                    )}
+                  <p>
+                    Total:{" "}
+                    <strong>{formatDistance(distance.distanceTotal)} </strong>{" "}
+                    in <strong>{distance.timeTotal} hours </strong>
+                  </p>
+                </div>
               </div>
             );
           }
