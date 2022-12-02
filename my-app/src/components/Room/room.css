@@ -1,4 +1,51 @@
 .room-container {
-  width: 30%;
+  width: 25%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.room-container h1 {
+  padding: 20px 0px;
+  margin: 0px;
+  border-bottom: 1px solid #ccc;
+}
+
+.room-content {
   height: 100%;
+}
+
+.users-list {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.users {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.user {
+  width: 90%;
+  margin: auto;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.users p {
+  padding: 10px 0px;
+  margin: 0px;
 }

@@ -13,6 +13,7 @@ export interface User {
   };
   socketId: number;
   restaurant: RestaurantKeys;
+  color: string;
 }
 
 interface RoomProps {
@@ -25,6 +26,7 @@ interface RoomProps {
   onSelectRoom: (username: string, room: any) => void;
   onSendMessage: (message: string, user: User) => void;
   messages: any[];
+  onUserLeave: (user: User) => void;
 }
 
 export const Room = (props: RoomProps) => {
@@ -37,6 +39,7 @@ export const Room = (props: RoomProps) => {
     onSelectRoom,
     onSendMessage,
     messages,
+    onUserLeave,
   } = props;
   const [username, setUsername] = useState("");
   const [isInRoom, setIsInRoom] = useState(false);
@@ -81,15 +84,34 @@ export const Room = (props: RoomProps) => {
         )}
         {isInRoom && (
           <div className="users">
-            {users.map((user, index) => (
-              <div key={index} className="user">
-                <p
-                  style={currentUser?.id === user.id ? { color: "green" } : {}}
-                >
-                  {user.name}
-                </p>
-              </div>
-            ))}
+            <button
+              onClick={() => {
+                onUserLeave(currentUser as User);
+                setIsInRoom(false);
+              }}
+            >
+              Leave Room
+            </button>
+            <h2>Users</h2>
+            <div className="users-list">
+              {users.map((user, index) => (
+                <div key={index} className="user">
+                  <p
+                    style={{
+                      color: user.color,
+                    }}
+                  >
+                    {user.name} {currentUser?.id === user.id && "(You)"}
+                  </p>
+                  <div
+                    className="user-color"
+                    style={{
+                      backgroundColor: user.color,
+                    }}
+                  ></div>
+                </div>
+              ))}
+            </div>
             <Messages
               messages={messages}
               onSendMessage={onSendMessage}

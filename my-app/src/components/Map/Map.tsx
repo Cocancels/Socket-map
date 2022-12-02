@@ -88,7 +88,16 @@ export const Map = (props: MapProps) => {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     const d = R * c; // in metres
+
+    // if less than 1km, show meters
     return Math.round(d / 1000);
+  };
+
+  const formatDistance = (distance: number) => {
+    if (distance < 1) {
+      return `${Math.round(distance * 1000)} m`;
+    }
+    return `${distance} km`;
   };
 
   const eventHandlers = useMemo(
@@ -220,14 +229,13 @@ export const Map = (props: MapProps) => {
     return time;
   };
 
-  useEffect(() => {}, []);
-
   useEffect(() => {
     currentUser && !currentUser?.position.lat && getLocation();
     currentUser?.position.lat && getUserRestaurantDistance(currentUser);
   }, [currentUser]);
 
   useEffect(() => {
+    console.log(users);
     users.forEach((user) => {
       if (user.id !== currentUser?.id) {
         user.position.lat && getUserRestaurantDistance(user);
@@ -272,18 +280,18 @@ export const Map = (props: MapProps) => {
                 </Marker>
 
                 <Polyline
-                  pathOptions={{ color: "red" }}
+                  pathOptions={{ color: currentUser.color }}
                   positions={[position, selectedRestaurant.position]}
                 />
 
                 <Polyline
-                  pathOptions={{ color: "red" }}
+                  pathOptions={{ color: currentUser.color }}
                   positions={[selectedRestaurant.position, finalPosition]}
                 />
               </>
             ) : (
               <Polyline
-                pathOptions={{ color: "red" }}
+                pathOptions={{ color: currentUser.color }}
                 positions={[position, finalPosition]}
               />
             )}
@@ -295,20 +303,25 @@ export const Map = (props: MapProps) => {
                     <Marker position={user.position}>
                       <Popup>{user.name}</Popup>
                     </Marker>
-                    {user.restaurant.position && (
+                    {user.restaurant.position ? (
                       <>
                         <Polyline
-                          pathOptions={{ color: "red" }}
+                          pathOptions={{ color: user.color }}
                           positions={[user.position, user.restaurant.position]}
                         />
                         <Marker position={user.restaurant.position}>
                           <Popup>{user.restaurant.name}</Popup>
                         </Marker>
                         <Polyline
-                          pathOptions={{ color: "red" }}
+                          pathOptions={{ color: user.color }}
                           positions={[user.restaurant.position, finalPosition]}
                         />
                       </>
+                    ) : (
+                      <Polyline
+                        pathOptions={{ color: user.color }}
+                        positions={[user.position, finalPosition]}
+                      />
                     )}
                   </div>
                 );
@@ -331,22 +344,26 @@ export const Map = (props: MapProps) => {
           return (
             <div key={index}>
               <h3>{user?.name}</h3>
-              {distance.distanceRestaurant && distance.distanceRestaurantFinal && (
-                <>
-                  <p>
-                    To go to the restaurant {user?.restaurant.name}:{" "}
-                    <strong>{distance.timeRestaurant} hours</strong> for{" "}
-                    {distance.distanceRestaurant} km
-                  </p>
-                  <p>
-                    To go to the final position:{" "}
-                    <strong>{distance.distanceRestaurantFinal} km</strong> in{" "}
-                    <strong>{distance.timeRestaurantFinal} hours</strong>
-                  </p>
-                </>
-              )}
+              {distance.distanceRestaurant &&
+                distance.distanceRestaurantFinal && (
+                  <>
+                    <p>
+                      To go to the restaurant {user?.restaurant.name}:{" "}
+                      <strong>{distance.timeRestaurant} hours</strong> for{" "}
+                      {formatDistance(distance.distanceRestaurant)}
+                    </p>
+                    <p>
+                      To go to the final position:{" "}
+                      <strong>
+                        {formatDistance(distance.distanceRestaurantFinal)}
+                      </strong>{" "}
+                      in <strong>{distance.timeRestaurantFinal} hours</strong>
+                    </p>
+                  </>
+                )}
               <p>
-                Total: <strong>{distance.distanceTotal} </strong>km in{" "}
+                Total:{" "}
+                <strong>{formatDistance(distance.distanceTotal)} </strong> in{" "}
                 <strong>{distance.timeTotal} hours </strong>
               </p>
             </div>

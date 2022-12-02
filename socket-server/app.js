@@ -24,6 +24,24 @@ const server = http.createServer(app);
 
 const rooms = {};
 
+const colors = [
+  "red",
+  "blue",
+  "green",
+  "yellow",
+  "orange",
+  "purple",
+  "pink",
+  "brown",
+  "black",
+  "white",
+];
+
+// function to get random color
+const getRandomColor = () => {
+  return colors[Math.floor(Math.random() * colors.length)];
+};
+
 app.get("/rooms", (req, res) => {
   res.status(200).json(rooms);
 });
@@ -45,8 +63,11 @@ io.on("connection", (socket) => {
         lng: 0,
       },
       currentUser: null,
+      usedColors: [],
     };
   }
+
+  const newUserColor = getRandomColor();
 
   const newUser = {
     id: rooms[socket.room].users.length,
@@ -55,10 +76,12 @@ io.on("connection", (socket) => {
     socketId: socket.id,
     restaurant: {},
     position: {},
+    color: newUserColor,
   };
 
   socket.emit("init", { ...rooms[socket.room], currentUser: newUser });
   rooms[socket.room].users.push(newUser);
+  rooms[socket.room].usedColors.push(newUserColor);
   io.to(socket.room).emit("newUser", rooms[socket.room].users);
 
   const joinMessage = {
@@ -111,6 +134,28 @@ io.on("connection", (socket) => {
       lng: finalPos.lng,
     };
     io.to(socket.room).emit("getFinalPosition", finalPosition);
+  });
+
+  // socket on leave room
+  socket.on("leaveRoom", (user) => {
+    const leaveMessage = {
+      user: user,
+      message: `I just left the room !`,
+      createdAt: new Date(),
+    };
+
+    rooms[socket.room].messages.push(leaveMessage);
+    io.to(socket.room).emit("newMessage", rooms[socket.room].messages);
+
+    rooms[socket.room].users = rooms[socket.room].users.filter(
+      (u) => u.id !== user.id
+    );
+
+    rooms[socket.room].usedColors = rooms[socket.room].usedColors.filter(
+      (c) => c !== user.color
+    );
+
+    io.to(socket.room).emit("newUser", rooms[socket.room].users);
   });
 
   socket.on("disconnect", () => {
