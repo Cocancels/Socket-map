@@ -275,10 +275,6 @@ export const Map = (props: MapProps) => {
         />
         {currentUser && (
           <>
-            <Marker position={position}>
-              <Popup>You</Popup>
-            </Marker>
-
             {selectedRestaurant.id !== 0 ? (
               <>
                 <Marker position={selectedRestaurant.position}>
@@ -309,7 +305,6 @@ export const Map = (props: MapProps) => {
                   "/marker-icon-2x-" +
                   user.color +
                   ".png",
-                iconRetinaUrl: user.color,
                 iconSize: [25, 41],
                 iconAnchor: [12, 41],
                 popupAnchor: [1, -34],
@@ -361,33 +356,36 @@ export const Map = (props: MapProps) => {
       <div className="map-distances">
         {distances.map((distance: any, index: number) => {
           const user = users.find((user) => user.id === distance.userId);
-          return (
-            <div key={index}>
-              <h3>{user?.name}</h3>
-              {distance.distanceRestaurant &&
-                distance.distanceRestaurantFinal && (
-                  <>
-                    <p>
-                      To go to the restaurant {user?.restaurant.name}:{" "}
-                      <strong>{distance.timeRestaurant} hours</strong> for{" "}
-                      {formatDistance(distance.distanceRestaurant)}
-                    </p>
-                    <p>
-                      To go to the final position:{" "}
-                      <strong>
-                        {formatDistance(distance.distanceRestaurantFinal)}
-                      </strong>{" "}
-                      in <strong>{distance.timeRestaurantFinal} hours</strong>
-                    </p>
-                  </>
-                )}
-              <p>
-                Total:{" "}
-                <strong>{formatDistance(distance.distanceTotal)} </strong> in{" "}
-                <strong>{distance.timeTotal} hours </strong>
-              </p>
-            </div>
-          );
+          if (user) {
+            return (
+              <div key={index}>
+                <h3>{user?.name}</h3>
+                {distance.distanceRestaurant &&
+                  distance.distanceRestaurantFinal && (
+                    <>
+                      <p>
+                        To go to the restaurant {user?.restaurant.name}:{" "}
+                        <strong>{distance.timeRestaurant} hours</strong> for{" "}
+                        {formatDistance(distance.distanceRestaurant)}
+                      </p>
+                      <p>
+                        To go to the final position:{" "}
+                        <strong>
+                          {formatDistance(distance.distanceRestaurantFinal)}
+                        </strong>{" "}
+                        in <strong>{distance.timeRestaurantFinal} hours</strong>
+                      </p>
+                    </>
+                  )}
+                <p>
+                  Total:{" "}
+                  <strong>{formatDistance(distance.distanceTotal)} </strong> in{" "}
+                  <strong>{distance.timeTotal} hours </strong>
+                </p>
+              </div>
+            );
+          }
+          return <></>;
         })}
       </div>
     </div>

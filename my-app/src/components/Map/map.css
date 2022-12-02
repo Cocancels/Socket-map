@@ -1,12 +1,16 @@
 .map-container {
-  width: 50%;
+  width: 60%;
   height: 100%;
+  border-left: #4963b1 2px solid;
+  border-right: #4963b1 2px solid;
 }
 
 .map-container h1 {
   padding: 20px 0px;
   margin: 0px;
   border-bottom: 1px solid #ccc;
+  background-color: #4963b1;
+  color: white;
 }
 
 .leaflet-container {

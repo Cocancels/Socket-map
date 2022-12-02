@@ -7,37 +7,40 @@ interface RoomListProps {
   onSelectRoom: (username: string, room: any) => void;
 }
 
+export const formatRoomName = (roomName: string) => {
+  const splitRoomName = roomName.split("");
+  const formattedRoomName = splitRoomName.map((char, index) => {
+    if (index === 0) {
+      return char.toUpperCase();
+    }
+    if (char === char.toUpperCase()) {
+      return " " + char;
+    }
+    return char;
+  });
+  return formattedRoomName.join("");
+};
+
 export const RoomList = (props: RoomListProps) => {
   const { rooms, username, onSelectRoom, room } = props;
 
-  const formatRoomName = (roomName: string) => {
-    const splitRoomName = roomName.split("");
-    const formattedRoomName = splitRoomName.map((char, index) => {
-      if (index === 0) {
-        return char.toUpperCase();
-      }
-      if (char === char.toUpperCase()) {
-        return " " + char;
-      }
-      return char;
-    });
-    return formattedRoomName.join("");
-  };
-
   return (
-    <div className="users">
+    <div className="room-list">
       {rooms.length > 0 &&
         room.length === 0 &&
         rooms.map((room: any, index: any) => (
-          <div key={index}>
-            <p>{formatRoomName(room.name)}</p>
-            <p>{room.users.length} / 10</p>
+          <div key={index} className="room">
             <button
               onClick={() => {
                 onSelectRoom(username, room.name);
               }}
+              disabled={username.length === 0}
+              className={username.length === 0 ? "disabled" : ""}
             >
-              Join {formatRoomName(room.name)}
+              <div>
+                Join {formatRoomName(room.name)}
+                <p>{room.users.length} / 10</p>
+              </div>
             </button>
           </div>
         ))}

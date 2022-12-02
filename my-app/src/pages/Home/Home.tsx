@@ -18,6 +18,7 @@ export const Home = () => {
     id: 0,
     name: "",
     image: "",
+    description: "",
     position: {
       lat: 0,
       lng: 0,
@@ -155,6 +156,7 @@ export const Home = () => {
         onRestaurantClick={handleRestaurantClick}
         selectedRestaurant={selectedRestaurant}
         setSelectedRestaurant={setSelectedRestaurant}
+        currentUser={currentUser}
       />
       <Map
         selectedRestaurant={selectedRestaurant}
@@ -172,6 +174,7 @@ export const Home = () => {
         selectedRestaurant={selectedRestaurant}
         onCreateUser={(u: any) => connectToSocket(u, room)}
         onSelectRoom={(username: string, room: string) => {
+          console.log(room);
           setRoom(room);
           connectToSocket(username, room);
         }}
