@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./room.css";
 import { RestaurantKeys } from "../../interfaces/Restaurant";
-import { RoomList } from "./RoomList";
+import { formatRoomName, RoomList } from "./RoomList";
 import { Messages } from "./Messages/Messages";
 
 export interface User {
@@ -59,40 +59,48 @@ export const Room = (props: RoomProps) => {
       <h1>Room</h1>
       <div className="room-content">
         {!isInRoom && (
-          <>
-            <input
-              type="text"
-              placeholder="Enter your name"
-              value={username}
-              onChange={handleUsernameChange}
-            />
-            <button
-              onClick={() => {
-                onCreateUser(username);
-                setIsInRoom(true);
-              }}
-            >
-              Create Room
-            </button>
-            <RoomList
-              username={username}
-              rooms={rooms}
-              onSelectRoom={onSelectRoom}
-              room={room}
-            />
-          </>
+          <div className="rooms">
+            <div className="rooms-instance">
+              <input
+                type="text"
+                placeholder="Enter your name"
+                value={username}
+                onChange={handleUsernameChange}
+              />
+              <button
+                onClick={() => {
+                  onCreateUser(username);
+                  setIsInRoom(true);
+                }}
+                disabled={username.length === 0}
+                className={username.length === 0 ? "disabled" : ""}
+              >
+                Create Room
+              </button>
+            </div>
+
+            {rooms.length > 0 && (
+              <>
+                <div className="rooms-choice">
+                  <p>OR</p>
+                </div>
+
+                <RoomList
+                  username={username}
+                  rooms={rooms}
+                  onSelectRoom={onSelectRoom}
+                  room={room}
+                />
+              </>
+            )}
+          </div>
         )}
         {isInRoom && (
           <div className="users">
-            <button
-              onClick={() => {
-                onUserLeave(currentUser as User);
-                setIsInRoom(false);
-              }}
-            >
-              Leave Room
-            </button>
-            <h2>Users</h2>
+            <div className="users-header">
+              <h2>{formatRoomName(room)}</h2>
+              <p> {users.length} / 10</p>
+            </div>
             <div className="users-list">
               {users.map((user, index) => (
                 <div key={index} className="user">
@@ -112,6 +120,14 @@ export const Room = (props: RoomProps) => {
                 </div>
               ))}
             </div>
+            <button
+              onClick={() => {
+                onUserLeave(currentUser as User);
+                setIsInRoom(false);
+              }}
+            >
+              Leave Room
+            </button>
             <Messages
               messages={messages}
               onSendMessage={onSendMessage}

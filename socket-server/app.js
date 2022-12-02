@@ -31,7 +31,6 @@ const colors = [
   "yellow",
   "orange",
   "gold",
-  "brown",
   "black",
   "violet",
   "grey",

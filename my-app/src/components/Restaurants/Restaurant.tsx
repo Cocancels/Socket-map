@@ -1,5 +1,6 @@
 import "./restaurants.css";
 import { RestaurantKeys } from "../../interfaces/Restaurant";
+import { AiOutlineCheck } from "react-icons/ai";
 
 interface RestaurantProps {
   selected: boolean;
@@ -11,14 +12,26 @@ export const Restaurant = (props: RestaurantProps) => {
   const { restaurant, onRestaurantClick, selected } = props;
 
   const handleRestaurantClick = () => {
-    onRestaurantClick(restaurant);
+    onRestaurantClick(restaurant); //
   };
 
   return (
     <div className="restaurant-container" onClick={handleRestaurantClick}>
-      <p>{restaurant.name}</p>
       <img src={restaurant.image} alt="" />
-      {selected && <p>Selected</p>}
+
+      <div className="restaurant-info">
+        <h3>{restaurant.name}</h3>
+        <div className="restaurant-info-content">
+          <p>{restaurant.description}</p>
+          <button
+            className={
+              (selected ? "selected" : "not-selected") + " restaurant-button"
+            }
+          >
+            {selected ? <AiOutlineCheck /> : "Go"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

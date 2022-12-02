@@ -1,12 +1,16 @@
 .map-container {
-  width: 50%;
+  width: 60%;
   height: 100%;
+  border-left: #4963b1 2px solid;
+  border-right: #4963b1 2px solid;
 }
 
 .map-container h1 {
   padding: 20px 0px;
   margin: 0px;
   border-bottom: 1px solid #ccc;
+  background-color: #4963b1;
+  color: white;
 }
 
 .leaflet-container {
@@ -17,4 +21,35 @@
 .map-distances {
   height: 35vh;
   overflow-y: auto;
+}
+
+.map-distances h2 {
+  display: inline-block;
+  padding: 0px 20px 10px 20px;
+  margin: 20px 0px;
+  border-bottom: #ccc 1px solid;
+}
+
+.map-distance {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.map-distance h3 {
+  margin-bottom: 20px;
+}
+
+.distances-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.distances-restaurant p {
+  margin: 10px 0px;
 }
