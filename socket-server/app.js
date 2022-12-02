@@ -30,11 +30,11 @@ const colors = [
   "green",
   "yellow",
   "orange",
-  "purple",
-  "pink",
+  "gold",
   "brown",
   "black",
-  "white",
+  "violet",
+  "grey",
 ];
 
 // function to get random color
@@ -67,7 +67,13 @@ io.on("connection", (socket) => {
     };
   }
 
-  const newUserColor = getRandomColor();
+  let newUserColor = getRandomColor();
+
+  rooms[socket.room].usedColors.forEach((color) => {
+    if (color === newUserColor) {
+      newUserColor = getRandomColor();
+    }
+  });
 
   const newUser = {
     id: rooms[socket.room].users.length,

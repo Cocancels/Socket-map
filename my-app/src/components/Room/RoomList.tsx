@@ -10,7 +10,6 @@ interface RoomListProps {
 export const RoomList = (props: RoomListProps) => {
   const { rooms, username, onSelectRoom, room } = props;
 
-  // function to make a space between words and numbers
   const formatRoomName = (roomName: string) => {
     const splitRoomName = roomName.split("");
     const formattedRoomName = splitRoomName.map((char, index) => {
@@ -32,6 +31,7 @@ export const RoomList = (props: RoomListProps) => {
         rooms.map((room: any, index: any) => (
           <div key={index}>
             <p>{formatRoomName(room.name)}</p>
+            <p>{room.users.length} / 10</p>
             <button
               onClick={() => {
                 onSelectRoom(username, room.name);

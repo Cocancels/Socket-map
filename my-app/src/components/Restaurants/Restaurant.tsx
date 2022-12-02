@@ -1,6 +1,5 @@
 import "./restaurants.css";
 import { RestaurantKeys } from "../../interfaces/Restaurant";
-import { useState } from "react";
 
 interface RestaurantProps {
   selected: boolean;

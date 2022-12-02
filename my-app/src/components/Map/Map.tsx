@@ -29,6 +29,8 @@ interface MapProps {
     lng: number;
   };
   setFinalPosition: (pos: any) => void;
+  distances: any[];
+  setDistances: (distances: any[]) => void;
 }
 
 export const Map = (props: MapProps) => {
@@ -39,6 +41,8 @@ export const Map = (props: MapProps) => {
     onUpdateCurrentPosition,
     finalPosition,
     setFinalPosition,
+    distances,
+    setDistances,
   } = props;
 
   const [position, setPosition] = useState<any>({
@@ -46,8 +50,6 @@ export const Map = (props: MapProps) => {
     lng: 0,
   });
   const [map, setMap] = useState<any>();
-
-  const [distances, setDistances] = useState<any>([]);
 
   const getLocation = () => {
     if (navigator.geolocation) {
@@ -109,6 +111,7 @@ export const Map = (props: MapProps) => {
         }
       },
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
@@ -232,15 +235,17 @@ export const Map = (props: MapProps) => {
   useEffect(() => {
     currentUser && !currentUser?.position.lat && getLocation();
     currentUser?.position.lat && getUserRestaurantDistance(currentUser);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
   useEffect(() => {
-    console.log(users);
     users.forEach((user) => {
       if (user.id !== currentUser?.id) {
         user.position.lat && getUserRestaurantDistance(user);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [users]);
 
   useEffect(() => {
@@ -251,6 +256,7 @@ export const Map = (props: MapProps) => {
         user.position.lat && getUserRestaurantDistance(user);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finalPosition]);
 
   return (
@@ -297,10 +303,23 @@ export const Map = (props: MapProps) => {
             )}
 
             {users.map((user) => {
+              const icon = new L.Icon({
+                iconUrl:
+                  window.location.origin +
+                  "/marker-icon-2x-" +
+                  user.color +
+                  ".png",
+                iconRetinaUrl: user.color,
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                tooltipAnchor: [16, -28],
+                shadowSize: [41, 41],
+              });
               if (user.position.lat) {
                 return (
                   <div key={user.id}>
-                    <Marker position={user.position}>
+                    <Marker position={user.position} icon={icon}>
                       <Popup>{user.name}</Popup>
                     </Marker>
                     {user.restaurant.position ? (
@@ -309,7 +328,7 @@ export const Map = (props: MapProps) => {
                           pathOptions={{ color: user.color }}
                           positions={[user.position, user.restaurant.position]}
                         />
-                        <Marker position={user.restaurant.position}>
+                        <Marker position={user.restaurant.position} icon={icon}>
                           <Popup>{user.restaurant.name}</Popup>
                         </Marker>
                         <Polyline
@@ -326,6 +345,7 @@ export const Map = (props: MapProps) => {
                   </div>
                 );
               }
+              return null;
             })}
             <Marker
               position={finalPosition}
