@@ -1,4 +1,4 @@
-<h1>Projet du cours d'Algorithmie en temps réel : Lunch Map</h1>
+<h1>Projet du cours d'Algorithmie en temps réel : Lunch Map (Par Kélian RAOULT SEVERAC et Corentin ANCEL)</h1>
 
 <h2>Objectifs :</h2>
 
